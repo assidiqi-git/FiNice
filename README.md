@@ -1,16 +1,22 @@
-# finice
+# Finice - Aplikasi Pencatat Keuangan Harian
 
-A new Flutter project.
+Finice adalah sebuah aplikasi sederhana yang dirancang untuk membantu pengguna mencatat transaksi keuangan harian mereka. Aplikasi ini berfungsi sebagai alat pencatatan pemasukan dan pengeluaran.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+## 📖 Tentang Proyek Ini
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Proyek ini merupakan implementasi mandiri yang dibuat setelah menyelesaikan sebuah tutorial di [YouTube Flutter Mapp](https://www.youtube.com/watch?v=3kaGC_DrUnw&pp=ygULZmx1dHRlciBtYXA%3D). Tujuan utama dari proyek ini adalah untuk mempraktikkan dan memperkuat pemahaman konsep yang telah dipelajari dari tutorial tersebut, terutama dalam hal:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+* Key Concepts
+* Basic Layouts
+* Master Layout
+* Debugging
+* States
+* User Inputs
+* Navigation
+* Clean UI
+* Packages
+
+
+Ini adalah langkah awal saya untuk membangun sesuatu dari awal hingga akhir berdasarkan ilmu yang telah didapat.
