@@ -1,6 +1,7 @@
 import 'package:finice/viewmodels/add_category_view_model.dart';
 import 'package:finice/views/widget/icon_picker_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class AddCategoryPage extends StatelessWidget {
@@ -254,10 +255,12 @@ class _AddCategoryPageContentState extends State<_AddCategoryPageContent> {
                               if (success && context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
+                                    behavior: SnackBarBehavior.floating,
                                     content: Text('Berhasil disimpan'),
                                     backgroundColor: Colors.green,
                                   ),
                                 );
+                                context.pop(true);
                               }
                             },
                       style: FilledButton.styleFrom(

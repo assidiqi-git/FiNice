@@ -1,5 +1,6 @@
 import 'package:finice/viewmodels/category_view_model.dart';
 import 'package:finice/views/widget/category_list_widget.dart';
+import 'package:finice/views/widget/category_type_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -23,10 +24,10 @@ class _CategoryPageContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<CategoryViewModel>();
 
-    return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: () => viewModel.fetchCategories(),
-        child: Padding(
+    return RefreshIndicator(
+      onRefresh: () => viewModel.fetchCategories(),
+      child: Scaffold(
+        body: Padding(
           padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
           child: Column(
             children: [
@@ -43,26 +44,29 @@ class _CategoryPageContent extends StatelessWidget {
                   height: 50, // Tinggi umum untuk komponen input
                   child: Row(
                     children: [
-                      _buildTypeButton(
-                        context,
-                        viewModel,
-                        'Incomes',
-                        'income',
-                        Colors.indigo,
+                      CategoryTypeButton(
+                        label: "Incomes",
+                        color: Colors.indigo,
+                        isActive: viewModel.selectedType == 'income',
+                        onTap: () => context
+                            .read<CategoryViewModel>()
+                            .setSelectedType('income'),
                       ),
-                      _buildTypeButton(
-                        context,
-                        viewModel,
-                        'Expenses',
-                        'expense',
-                        Colors.red,
+                      CategoryTypeButton(
+                        label: "Expenses",
+                        color: Colors.red,
+                        isActive: viewModel.selectedType == 'expense',
+                        onTap: () => context
+                            .read<CategoryViewModel>()
+                            .setSelectedType('expense'),
                       ),
-                      _buildTypeButton(
-                        context,
-                        viewModel,
-                        'Savings',
-                        'saving',
-                        Colors.green,
+                      CategoryTypeButton(
+                        label: "Savings",
+                        color: Colors.green,
+                        isActive: viewModel.selectedType == 'saving',
+                        onTap: () => context
+                            .read<CategoryViewModel>()
+                            .setSelectedType('saving'),
                       ),
                     ],
                   ),
@@ -78,8 +82,16 @@ class _CategoryPageContent extends StatelessWidget {
                 ),
                 elevation: 2,
                 child: InkWell(
-                  onTap: () {
-                    context.pushNamed('add_category');
+                  onTap: () async {
+                    final bool? refresh = await context.pushNamed<bool>(
+                      'add_category',
+                    );
+
+                    if (refresh == true) {
+                      if (context.mounted) {
+                        context.read<CategoryViewModel>().fetchCategories();
+                      }
+                    }
                   },
                   child: Row(
                     children: [
@@ -118,6 +130,7 @@ class _CategoryPageContent extends StatelessWidget {
                 ),
               ),
               Divider(height: 20),
+              // Header Category
               Container(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -128,12 +141,41 @@ class _CategoryPageContent extends StatelessWidget {
                   ),
                 ),
               ),
+              // List Category
+              SizedBox(height: 10),
               Expanded(
-                child: viewModel.isLoading
-                    ? Center(child: CircularProgressIndicator())
-                    : viewModel.filteredCategories.isEmpty
-                    ? Center(child: Text("Tidak ada data"))
-                    : ListView.builder(
+                child: Builder(
+                  builder: (context) {
+                    if (viewModel.isLoading) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+
+                    if (viewModel.errorMessage != null) {
+                      return SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: Column(
+                            children: [
+                              Center(child: Text(viewModel.errorMessage!)),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+
+                    if (viewModel.filteredCategories.isEmpty) {
+                      return SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: Column(
+                            children: [Center(child: Text("Data tidak ada"))],
+                          ),
+                        ),
+                      );
+                    } else {
+                      return ListView.builder(
                         itemCount: viewModel.filteredCategories.length,
                         itemBuilder: (context, index) {
                           final category = viewModel.filteredCategories[index];
@@ -144,7 +186,10 @@ class _CategoryPageContent extends StatelessWidget {
                             description: category.description,
                           );
                         },
-                      ),
+                      );
+                    }
+                  },
+                ),
               ),
             ],
           ),
@@ -152,37 +197,4 @@ class _CategoryPageContent extends StatelessWidget {
       ),
     );
   }
-}
-
-Widget _buildTypeButton(
-  BuildContext context,
-  CategoryViewModel viewModel,
-  String label,
-  String typeKey,
-  MaterialColor color,
-) {
-  final bool isActive = viewModel.selectedType == typeKey;
-  return Expanded(
-    // 4. Expanded agar membagi ruang
-    child: InkWell(
-      onTap: () {
-        context.read<CategoryViewModel>().setSelectedType(typeKey);
-      },
-      child: Container(
-        height: 50,
-        // 6. Gunakan Container untuk padding & alignment
-        alignment: Alignment.center,
-        decoration: BoxDecoration(color: isActive ? color[400] : Colors.white),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 18,
-            letterSpacing: 1,
-            fontWeight: FontWeight.w700,
-            color: isActive ? Colors.white : color[700], // Sesuaikan warna
-          ),
-        ),
-      ),
-    ),
-  );
 }
