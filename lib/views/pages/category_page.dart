@@ -1,4 +1,5 @@
 import 'package:finice/viewmodels/category_view_model.dart';
+import 'package:finice/views/widget/category_detail_sheet_widget.dart';
 import 'package:finice/views/widget/category_list_widget.dart';
 import 'package:finice/views/widget/category_type_button_widget.dart';
 import 'package:flutter/material.dart';
@@ -180,10 +181,20 @@ class _CategoryPageContent extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final category = viewModel.filteredCategories[index];
 
-                          return CategoryListWidget(
-                            title: category.name,
-                            tag: category.type,
-                            description: category.description,
+                          return InkWell(
+                            onTap: () {
+                              CategoryDetailSheetWidget.show(
+                                context,
+                                category: category,
+                                onEdit: () {},
+                                onDelete: () {},
+                              );
+                            },
+                            child: CategoryListWidget(
+                              title: category.name,
+                              tag: category.type,
+                              description: category.description,
+                            ),
                           );
                         },
                       );
