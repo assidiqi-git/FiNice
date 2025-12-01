@@ -44,7 +44,7 @@ class _AddActivityPageState extends State<AddActivityPage> {
                   side: BorderSide(color: Colors.grey[300]!, width: 1),
                 ),
                 elevation: 2,
-                child: Container(
+                child: SizedBox(
                   // 2. Beri tinggi yang pas untuk Row
                   height: 50, // Tinggi umum untuk komponen input
                   child: Row(
@@ -218,7 +218,6 @@ class _AddActivityPageState extends State<AddActivityPage> {
                   setState(() {
                     _mySelectedDate = newDate;
                   });
-                  print("Tanggal baru dipilih: $_mySelectedDate");
                 },
                 // (Opsional) Batasi tanggal
                 // firstDate: DateTime(2020),

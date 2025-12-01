@@ -1,7 +1,9 @@
-import 'package:finice/views/widget_tree.dart';
 import 'package:flutter/material.dart';
+import 'package:finice/router.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+Future main() async {
+  await dotenv.load(fileName: '.env');
   runApp(const FiNice());
 }
 
@@ -15,7 +17,8 @@ class FiNice extends StatefulWidget {
 class _FiNiceState extends State<FiNice> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: router,
       debugShowCheckedModeBanner: true,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -30,7 +33,6 @@ class _FiNiceState extends State<FiNice> {
           ),
         ),
       ),
-      home: WidgetTree(),
     );
   }
 }

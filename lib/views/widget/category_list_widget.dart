@@ -44,7 +44,7 @@ class CategoryListWidget extends StatelessWidget {
             ),
             Expanded(
               flex: 4,
-              child: Container(
+              child: SizedBox(
                 width: double.infinity,
                 child: Padding(
                   padding: const EdgeInsets.all(5),
@@ -66,7 +66,7 @@ class CategoryListWidget extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Container(
+              child: SizedBox(
                 width: double.infinity,
                 child: Padding(
                   padding: const EdgeInsets.all(5),

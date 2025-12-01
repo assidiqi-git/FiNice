@@ -1,17 +1,39 @@
-import 'package:finice/views/widget/dropdown_widget.dart';
+import 'package:finice/viewmodels/add_category_view_model.dart';
 import 'package:finice/views/widget/icon_picker_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class AddCategoryPage extends StatefulWidget {
+class AddCategoryPage extends StatelessWidget {
   const AddCategoryPage({super.key});
 
   @override
-  State<AddCategoryPage> createState() => _AddCategoryPageState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => AddCategoryViewmodel(),
+      child: _AddCategoryPageContent(),
+    );
+  }
 }
 
-class _AddCategoryPageState extends State<AddCategoryPage> {
-  String _selectedTag = 'income';
-  String? selectedCategory;
+// Pisahkan konten agar bisa akses 'Provider.of' atau 'Consumer'
+class _AddCategoryPageContent extends StatefulWidget {
+  const _AddCategoryPageContent();
+
+  @override
+  State<_AddCategoryPageContent> createState() =>
+      _AddCategoryPageContentState();
+}
+
+class _AddCategoryPageContentState extends State<_AddCategoryPageContent> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
   List<String> categories = ["Elektronik", "Fashion", "Makanan"];
   final List<IconData> _myIconList = [
     Icons.wallet,
@@ -33,6 +55,8 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
   IconData _selectedCategoryIcon = Icons.wallet; // Default
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<AddCategoryViewmodel>();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -51,6 +75,18 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
           child: Column(
             spacing: 15,
             children: [
+              if (viewModel.errorMessage != null)
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  margin: const EdgeInsets.only(bottom: 10),
+                  color: Colors.red[100],
+                  child: Text(
+                    viewModel.errorMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ),
+
+              // ICON HEADER
               Container(
                 alignment: Alignment.center,
                 child: ClipOval(
@@ -72,6 +108,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                 ),
               ),
 
+              // TYPE CATEGORY
               Card(
                 // Atur properti klip agar efek klik (ripple) ikut membulat
                 clipBehavior: Clip.antiAlias,
@@ -81,7 +118,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                   side: BorderSide(color: Colors.grey[300]!, width: 1),
                 ),
                 elevation: 2,
-                child: Container(
+                child: SizedBox(
                   // 2. Beri tinggi yang pas untuk Row
                   height: 50, // Tinggi umum untuk komponen input
                   child: Row(
@@ -92,12 +129,12 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                         // 4. Expanded agar membagi ruang
                         child: InkWell(
                           onTap: () {
-                            setState(() {
-                              _selectedTag = 'income';
-                            });
+                            context
+                                .read<AddCategoryViewmodel>()
+                                .setSelectedType('income');
                           },
                           child: Container(
-                            color: _selectedTag == 'income'
+                            color: viewModel.selectedType == 'income'
                                 ? Colors.indigo[400]
                                 : null,
                             alignment: Alignment.center,
@@ -107,7 +144,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                                 fontSize: 18,
                                 letterSpacing: 1,
                                 fontWeight: FontWeight.w700,
-                                color: _selectedTag == 'income'
+                                color: viewModel.selectedType == 'income'
                                     ? Colors
                                           .white // Sesuaikan warna
                                     : Colors.indigo[700],
@@ -119,12 +156,12 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                       Expanded(
                         child: InkWell(
                           onTap: () {
-                            setState(() {
-                              _selectedTag = 'expense';
-                            });
+                            context
+                                .read<AddCategoryViewmodel>()
+                                .setSelectedType('expense');
                           },
                           child: Container(
-                            color: _selectedTag == 'expense'
+                            color: viewModel.selectedType == 'expense'
                                 ? Colors.indigo[400]
                                 : null,
                             alignment: Alignment.center,
@@ -134,7 +171,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                                 fontSize: 18,
                                 letterSpacing: 1,
                                 fontWeight: FontWeight.w700,
-                                color: _selectedTag == 'expense'
+                                color: viewModel.selectedType == 'expense'
                                     ? Colors
                                           .white // Sesuaikan warna
                                     : Colors.indigo[700],
@@ -146,12 +183,12 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                       Expanded(
                         child: InkWell(
                           onTap: () {
-                            setState(() {
-                              _selectedTag = 'saving';
-                            });
+                            context
+                                .read<AddCategoryViewmodel>()
+                                .setSelectedType('saving');
                           },
                           child: Container(
-                            color: _selectedTag == 'saving'
+                            color: viewModel.selectedType == 'saving'
                                 ? Colors.indigo[400]
                                 : null,
                             alignment: Alignment.center,
@@ -161,7 +198,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                                 fontSize: 18,
                                 letterSpacing: 1,
                                 fontWeight: FontWeight.w700,
-                                color: _selectedTag == 'saving'
+                                color: viewModel.selectedType == 'saving'
                                     ? Colors
                                           .white // Sesuaikan warna
                                     : Colors.indigo[700],
@@ -175,7 +212,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                 ),
               ),
               IconPickerWidget(
-                label: "Icon",
+                label: '',
                 currentIcon: _selectedCategoryIcon,
                 iconList: _myIconList, // Berikan daftar ikon Anda
                 onIconSelected: (newIcon) {
@@ -185,64 +222,44 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                   });
                 },
               ),
-              Column(
-                children: [
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Category',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87, // Ganti sesuai tema Anda
-                      ),
-                    ),
-                  ),
-                  DropdownWidget<String>(
-                    hintText: "Pilih kategori...",
-                    value: selectedCategory,
-                    items: categories,
-                    // Untuk String, kita hanya perlu mengembalikan 'item' itu sendiri
-                    itemToString: (item) => item,
-                    onChanged: (newValue) {
-                      setState(() {
-                        selectedCategory = newValue;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null) return "Kategori wajib diisi";
-                      return null;
-                    },
-                  ),
-                ],
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Nama Kategori',
+                  border: OutlineInputBorder(),
+                ),
               ),
-              Column(
-                children: [
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Desctiption',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87, // Ganti sesuai tema Anda
-                      ),
-                    ),
-                  ),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: TextField(),
-                    ),
-                  ),
-                ],
+              TextField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Deskripsi Kategori',
+                  border: OutlineInputBorder(),
+                ),
               ),
 
               Row(
                 children: [
                   Expanded(
                     child: FilledButton(
-                      onPressed: () {},
+                      onPressed: viewModel.isLoading
+                          ? null
+                          : () async {
+                              final success = await context
+                                  .read<AddCategoryViewmodel>()
+                                  .submitCategory(
+                                    _nameController.text,
+                                    _descriptionController.text,
+                                  );
+
+                              if (success && context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Berhasil disimpan'),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              }
+                            },
                       style: FilledButton.styleFrom(
                         backgroundColor: Colors.indigo,
                         foregroundColor: Colors.white,
@@ -254,13 +271,16 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                           left: 10,
                           right: 10,
                         ),
-                        child: Text(
-                          'Add Category',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        child: viewModel.isLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text("Simpan Kategori"),
                       ),
                     ),
                   ),

@@ -1,369 +1,188 @@
-import 'package:finice/views/pages/add_category_page.dart';
+import 'package:finice/viewmodels/category_view_model.dart';
 import 'package:finice/views/widget/category_list_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
-class CategoryPage extends StatefulWidget {
+class CategoryPage extends StatelessWidget {
   const CategoryPage({super.key});
 
   @override
-  State<CategoryPage> createState() => _CategoryPageState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => CategoryViewModel()..fetchCategories(),
+      child: const _CategoryPageContent(),
+    );
+  }
 }
 
-class _CategoryPageState extends State<CategoryPage> {
-  String _selectedTag = 'income';
-  late Future<List<Map<String, dynamic>>> _dataFuture;
-
-  @override
-  void initState() {
-    _dataFuture = getData();
-    super.initState();
-  }
-
-  Future<List<Map<String, dynamic>>> getData() async {
-    await Future.delayed(const Duration(seconds: 3));
-    final List<Map<String, dynamic>> dataList = [
-      {
-        'title': 'Gaji Bulanan',
-        'description': 'Gaji pokok dari kantor',
-        'isImportant': true,
-        'tag': 'income',
-      },
-      {
-        'title': 'Bayar Listrik',
-        'description': 'Tagihan bulan ini',
-        'isImportant': true,
-        'tag': 'expense',
-      },
-      {
-        'title': 'Dana Darurat',
-        'description': 'Sisihkan 10% dari gaji',
-        'isImportant': true,
-        'tag': 'saving',
-      },
-      {
-        'title': 'Beli Kopi',
-        'description': null, // atau 'description': 'Kopi susu'
-        'isImportant': false,
-        'tag': 'expense',
-      },
-      {
-        'title': 'Bonus Project',
-        'description': null,
-        'isImportant': false,
-        'tag': 'income',
-      },
-      {
-        'title': 'Belanja Bulanan',
-        'description': 'Stok sabun, beras, minyak, dll.',
-        'isImportant': true,
-        'tag': 'expense',
-      },
-      {
-        'title': 'Investasi Reksadana',
-        'description': 'Pembelian rutin',
-        'isImportant': true,
-        'tag': 'saving',
-      },
-      {
-        'title': 'Bensin Motor',
-        'description': null,
-        'isImportant': false,
-        'tag': 'expense',
-      },
-      {
-        'title': 'Tabungan Liburan',
-        'description': null,
-        'isImportant': false,
-        'tag': 'saving',
-      },
-      {
-        'title': 'Makan Siang',
-        'description': 'Makan di warung',
-        'isImportant': false,
-        'tag': 'expense',
-      },
-    ];
-    return dataList;
-  }
-
-  void _onTagTapped(String tag) {
-    setState(() {
-      _selectedTag = tag;
-    });
-  }
+class _CategoryPageContent extends StatelessWidget {
+  const _CategoryPageContent();
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<CategoryViewModel>();
+
     return Scaffold(
-      body: Padding(
-        padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
-        child: SingleChildScrollView(
+      body: RefreshIndicator(
+        onRefresh: () => viewModel.fetchCategories(),
+        child: Padding(
+          padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
           child: Column(
             children: [
               SizedBox(height: 10),
-              Column(
-                spacing: 10,
-                children: [
-                  Card(
-                    // Atur properti klip agar efek klik (ripple) ikut membulat
-                    clipBehavior: Clip.antiAlias,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                      // (Opsional) Tambahkan outline/border
-                      side: BorderSide(color: Colors.grey[300]!, width: 1),
-                    ),
-                    elevation: 2,
-                    child: Container(
-                      // 2. Beri tinggi yang pas untuk Row
-                      height: 50, // Tinggi umum untuk komponen input
-                      child: Row(
-                        // 3. Bagi layout secara horizontal
-                        children: [
-                          // --- BAGIAN 'DATE RANGE' (Bisa Diklik) ---
-                          Expanded(
-                            // 4. Expanded agar membagi ruang
-                            child: InkWell(
-                              onTap: () {
-                                _onTagTapped('income');
-                              },
-                              child: _selectedTag == 'income'
-                                  ? Container(
-                                      color: Colors.indigo[400],
-                                      // 6. Gunakan Container untuk padding & alignment
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        "Incomes",
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          letterSpacing: 1,
-                                          fontWeight: FontWeight.w700,
-                                          color:
-                                              Colors.white, // Sesuaikan warna
-                                        ),
-                                      ),
-                                    )
-                                  : Container(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        'Incomes',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          letterSpacing: 1,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors
-                                              .indigo[700], // Sesuaikan warna
-                                        ),
-                                      ),
-                                    ),
-                            ),
-                          ),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () {
-                                _onTagTapped('expense');
-                              },
-                              child: _selectedTag == 'expense'
-                                  ? Container(
-                                      color: Colors.indigo[400],
-                                      // 6. Gunakan Container untuk padding & alignment
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        "Expenses",
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          letterSpacing: 1,
-                                          fontWeight: FontWeight.w700,
-                                          color:
-                                              Colors.white, // Sesuaikan warna
-                                        ),
-                                      ),
-                                    )
-                                  : Container(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        'Expenses',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          letterSpacing: 1,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors
-                                              .indigo[700], // Sesuaikan warna
-                                        ),
-                                      ),
-                                    ),
-                            ),
-                          ),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () {
-                                _onTagTapped('saving');
-                              },
-                              child: _selectedTag == 'saving'
-                                  ? Container(
-                                      color: Colors.indigo[400],
-                                      // 6. Gunakan Container untuk padding & alignment
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        "Savings",
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          letterSpacing: 1,
-                                          fontWeight: FontWeight.w700,
-                                          color:
-                                              Colors.white, // Sesuaikan warna
-                                        ),
-                                      ),
-                                    )
-                                  : Container(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        'Savings',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          letterSpacing: 1,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors
-                                              .indigo[700], // Sesuaikan warna
-                                        ),
-                                      ),
-                                    ),
-                            ),
-                          ),
-                        ],
+              // Type Button
+              Card(
+                clipBehavior: Clip.antiAlias,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  side: BorderSide(color: Colors.grey[300]!, width: 1),
+                ),
+                elevation: 2,
+                child: SizedBox(
+                  height: 50, // Tinggi umum untuk komponen input
+                  child: Row(
+                    children: [
+                      _buildTypeButton(
+                        context,
+                        viewModel,
+                        'Incomes',
+                        'income',
+                        Colors.indigo,
                       ),
-                    ),
+                      _buildTypeButton(
+                        context,
+                        viewModel,
+                        'Expenses',
+                        'expense',
+                        Colors.red,
+                      ),
+                      _buildTypeButton(
+                        context,
+                        viewModel,
+                        'Savings',
+                        'saving',
+                        Colors.green,
+                      ),
+                    ],
                   ),
-                  Card(
-                    clipBehavior: Clip.antiAlias,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                      side: BorderSide(color: Colors.grey[300]!, width: 1),
-                    ),
-                    elevation: 2,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return AddCategoryPage();
-                            },
+                ),
+              ),
+              SizedBox(height: 10),
+              // Add Category
+              Card(
+                clipBehavior: Clip.antiAlias,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  side: BorderSide(color: Colors.grey[300]!, width: 1),
+                ),
+                elevation: 2,
+                child: InkWell(
+                  onTap: () {
+                    context.pushNamed('add_category');
+                  },
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.all(15),
+                          alignment: Alignment.center,
+                          child: CircleAvatar(
+                            backgroundColor: Colors.indigo,
+                            radius: 25,
+                            child: Icon(
+                              Icons.add,
+                              size: 30,
+                              color: Colors.white,
+                            ),
                           ),
-                        );
-                      },
-                      child: Container(
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                padding: EdgeInsets.all(15),
-                                alignment: Alignment.center,
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.indigo,
-                                  radius: 25,
-                                  child: Icon(
-                                    Icons.add,
-                                    size: 30,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 3,
-                              child: Container(
-                                alignment: Alignment.center,
-                                child: Text(
-                                  'Add New Category',
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    letterSpacing: 1,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.indigo, // Sesuaikan warna
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
                         ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-
-              Column(
-                spacing: 5,
-                children: [
-                  Divider(height: 40),
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Income Categories',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  FutureBuilder<List<Map<String, dynamic>>>(
-                    future: _dataFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      }
-
-                      if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      }
-
-                      if (snapshot.hasData) {
-                        final List<Map<String, dynamic>> allItems =
-                            snapshot.data!;
-
-                        final List<Map<String, dynamic>> filteredItems =
-                            allItems.where((item) {
-                              // Konversi string tag dari data ke Enum
-                              final itemTag = item['tag'];
-                              // Bandingkan dengan tag yang dipilih
-                              return itemTag == _selectedTag;
-                            }).toList();
-
-                        if (filteredItems.isEmpty) {
-                          return const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(20.0),
-                              child: Text('Tidak ada data untuk kategori ini.'),
+                      Expanded(
+                        flex: 3,
+                        child: Container(
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Add New Category',
+                            style: TextStyle(
+                              fontSize: 22,
+                              letterSpacing: 1,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.indigo, // Sesuaikan warna
                             ),
-                          );
-                        }
-
-                        return Column(
-                          children: List.generate(filteredItems.length, (
-                            index,
-                          ) {
-                            final item = filteredItems[index];
-
-                            return CategoryListWidget(
-                              tag: item['tag'],
-                              description: item['description'],
-                              title: item['title'],
-                              isImportant: item['isImportant'],
-                            );
-                          }),
-                        );
-                      } else {
-                        return Center(child: Text('Error'));
-                      }
-                    },
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-              SizedBox(height: 20),
+              Divider(height: 20),
+              Container(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  '${viewModel.selectedType[0].toUpperCase()}${viewModel.selectedType.substring(1)} Categories',
+                  style: const TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: viewModel.isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : viewModel.filteredCategories.isEmpty
+                    ? Center(child: Text("Tidak ada data"))
+                    : ListView.builder(
+                        itemCount: viewModel.filteredCategories.length,
+                        itemBuilder: (context, index) {
+                          final category = viewModel.filteredCategories[index];
+
+                          return CategoryListWidget(
+                            title: category.name,
+                            tag: category.type,
+                            description: category.description,
+                          );
+                        },
+                      ),
+              ),
             ],
           ),
         ),
       ),
     );
   }
+}
+
+Widget _buildTypeButton(
+  BuildContext context,
+  CategoryViewModel viewModel,
+  String label,
+  String typeKey,
+  MaterialColor color,
+) {
+  final bool isActive = viewModel.selectedType == typeKey;
+  return Expanded(
+    // 4. Expanded agar membagi ruang
+    child: InkWell(
+      onTap: () {
+        context.read<CategoryViewModel>().setSelectedType(typeKey);
+      },
+      child: Container(
+        height: 50,
+        // 6. Gunakan Container untuk padding & alignment
+        alignment: Alignment.center,
+        decoration: BoxDecoration(color: isActive ? color[400] : Colors.white),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 18,
+            letterSpacing: 1,
+            fontWeight: FontWeight.w700,
+            color: isActive ? Colors.white : color[700], // Sesuaikan warna
+          ),
+        ),
+      ),
+    ),
+  );
 }
