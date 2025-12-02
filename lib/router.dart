@@ -1,8 +1,10 @@
+import 'package:finice/models/category_model.dart';
 import 'package:finice/views/main_scaffold_shell.dart';
 import 'package:finice/views/pages/activity_page.dart';
 import 'package:finice/views/pages/add_activity_page.dart';
 import 'package:finice/views/pages/add_category_page.dart';
 import 'package:finice/views/pages/category_page.dart';
+import 'package:finice/views/pages/edit_category_page.dart';
 import 'package:finice/views/pages/home_page.dart';
 import 'package:finice/views/pages/profile_page.dart';
 import 'package:flutter/material.dart';
@@ -68,6 +70,18 @@ final router = GoRouter(
       path: '/add-category',
       name: 'add_category',
       builder: (context, state) => AddCategoryPage(),
+    ),
+    GoRoute(
+      path: '/edit-category',
+      name: 'edit_category',
+      builder: (context, state) {
+        if (state.extra == null) {
+          return Scaffold(body: Center(child: Text("Data tidak ditemukan")));
+        }
+
+        final category = state.extra as CategoryModel;
+        return EditCategoryPage(category: category);
+      },
     ),
   ],
 );

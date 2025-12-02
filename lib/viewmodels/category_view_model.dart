@@ -37,7 +37,25 @@ class CategoryViewModel extends ChangeNotifier {
   }
 
   List<CategoryModel> get filteredCategories {
+    _isLoading = true;
     if (_categories.isEmpty) return [];
-    return _categories.where((item) => item.type == _selectedType).toList();
+    final newList = _categories
+        .where((item) => item.type == _selectedType)
+        .toList();
+    _isLoading = false;
+    return newList;
+  }
+
+  Future<bool> deleteCategory(int id) async {
+    try {
+      await _repository.deleteCategory(id);
+      fetchCategories();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll("Exception: ", "");
+      return false;
+    } finally {
+      notifyListeners(); // Update UI (Tampilkan List atau Error)
+    }
   }
 }

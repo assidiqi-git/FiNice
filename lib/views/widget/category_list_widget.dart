@@ -28,9 +28,9 @@ class CategoryListWidget extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 child: CircleAvatar(
                   backgroundColor: switch (tag) {
-                    'income' => Colors.green[500],
+                    'income' => Colors.indigo,
                     'expense' => Colors.red,
-                    'saving' => Colors.indigo,
+                    'saving' => Colors.green,
                     _ => Colors.black,
                   },
                   radius: 35,

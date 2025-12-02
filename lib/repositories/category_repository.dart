@@ -30,4 +30,31 @@ class CategoryRepository {
       throw Exception("Terjadi kesalahan sistem");
     }
   }
+
+  Future<void> updateCategory(CategoryModel category) async {
+    try {
+      await _dio.post('/category/${category.id}', data: category.toJson('PUT'));
+    } on DioException catch (e) {
+      String errorMessage =
+          e.response?.data['message'] ?? "Gagal terhubung ke server";
+      throw Exception(errorMessage);
+    } catch (e) {
+      throw Exception("Terjadi kesalahan yang tidak diketahui");
+    }
+  }
+
+  Future<void> deleteCategory(int id) async {
+    // final Map<String, dynamic> data = {'id': id, 'method': 'DELETE'};
+    try {
+      await _dio.post('/category/$id', data: {'_method': 'DELETE'});
+    } on DioException catch (e) {
+      String errorMessage =
+          e.response?.data['message'] ?? "Gagal terhubung ke server";
+      throw Exception(errorMessage);
+    } catch (e) {
+      throw Exception("Terjadi kesalahan yang tidak diketahui");
+    }
+
+    return;
+  }
 }

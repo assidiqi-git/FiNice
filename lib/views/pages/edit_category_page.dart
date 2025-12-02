@@ -1,42 +1,60 @@
-import 'package:finice/viewmodels/add_category_view_model.dart';
+import 'package:finice/models/category_model.dart';
+import 'package:finice/viewmodels/edit_category_view_model.dart';
 import 'package:finice/views/widget/category_type_button_widget.dart';
 import 'package:finice/views/widget/icon_picker_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-class AddCategoryPage extends StatelessWidget {
-  const AddCategoryPage({super.key});
+class EditCategoryPage extends StatelessWidget {
+  const EditCategoryPage({super.key, required this.category});
+
+  final CategoryModel category;
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => AddCategoryViewmodel(),
-      child: _AddCategoryPageContent(),
+      create: (_) => EditCategoryViewModel(),
+      child: _EditCategoryPageContent(category: category),
     );
   }
 }
 
 // Pisahkan konten agar bisa akses 'Provider.of' atau 'Consumer'
-class _AddCategoryPageContent extends StatefulWidget {
-  const _AddCategoryPageContent();
+class _EditCategoryPageContent extends StatefulWidget {
+  const _EditCategoryPageContent({required this.category});
+
+  final CategoryModel category;
 
   @override
-  State<_AddCategoryPageContent> createState() =>
-      _AddCategoryPageContentState();
+  State<_EditCategoryPageContent> createState() =>
+      _EditCategoryPageContentState();
 }
 
-class _AddCategoryPageContentState extends State<_AddCategoryPageContent> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+class _EditCategoryPageContentState extends State<_EditCategoryPageContent> {
+  late TextEditingController _nameController;
+  late TextEditingController _descriptionController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.category.name);
+    _descriptionController = TextEditingController(
+      text: widget.category.description,
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<EditCategoryViewModel>().loadData(widget.category);
+    });
+  }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
-  List<String> categories = ["Elektronik", "Fashion", "Makanan"];
   final List<IconData> _myIconList = [
     Icons.wallet,
     Icons.shopping_cart,
@@ -57,12 +75,13 @@ class _AddCategoryPageContentState extends State<_AddCategoryPageContent> {
   IconData _selectedCategoryIcon = Icons.wallet; // Default
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<AddCategoryViewmodel>();
+    final viewModel = context.watch<EditCategoryViewModel>();
+    // viewModel.setSelectedType(category.type);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Add Category',
+          'Edit Category',
           style: TextStyle(
             color: Colors.black,
             fontSize: 30,
@@ -125,7 +144,7 @@ class _AddCategoryPageContentState extends State<_AddCategoryPageContent> {
                         color: Colors.indigo,
                         isActive: viewModel.selectedType == 'income',
                         onTap: () => context
-                            .read<AddCategoryViewmodel>()
+                            .read<EditCategoryViewModel>()
                             .setSelectedType('income'),
                       ),
                       CategoryTypeButton(
@@ -133,7 +152,7 @@ class _AddCategoryPageContentState extends State<_AddCategoryPageContent> {
                         color: Colors.red,
                         isActive: viewModel.selectedType == 'expense',
                         onTap: () => context
-                            .read<AddCategoryViewmodel>()
+                            .read<EditCategoryViewModel>()
                             .setSelectedType('expense'),
                       ),
                       CategoryTypeButton(
@@ -141,7 +160,7 @@ class _AddCategoryPageContentState extends State<_AddCategoryPageContent> {
                         color: Colors.green,
                         isActive: viewModel.selectedType == 'saving',
                         onTap: () => context
-                            .read<AddCategoryViewmodel>()
+                            .read<EditCategoryViewModel>()
                             .setSelectedType('saving'),
                       ),
                     ],
@@ -184,8 +203,8 @@ class _AddCategoryPageContentState extends State<_AddCategoryPageContent> {
                           ? null
                           : () async {
                               final success = await context
-                                  .read<AddCategoryViewmodel>()
-                                  .submitCategory(
+                                  .read<EditCategoryViewModel>()
+                                  .updateCategory(
                                     _nameController.text,
                                     _descriptionController.text,
                                   );
@@ -194,7 +213,7 @@ class _AddCategoryPageContentState extends State<_AddCategoryPageContent> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     behavior: SnackBarBehavior.floating,
-                                    content: Text('Berhasil disimpan'),
+                                    content: Text('Berhasil update'),
                                     backgroundColor: Colors.green,
                                   ),
                                 );
@@ -221,7 +240,7 @@ class _AddCategoryPageContentState extends State<_AddCategoryPageContent> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text("Simpan Kategori"),
+                            : const Text("Ubah Kategori"),
                       ),
                     ),
                   ),

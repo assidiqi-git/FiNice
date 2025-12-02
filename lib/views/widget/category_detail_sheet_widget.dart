@@ -1,3 +1,4 @@
+import 'package:finice/views/widget/confirmation_dialog_widget.dart';
 import 'package:flutter/material.dart';
 // Ganti dengan import model Anda yang sebenarnya
 import 'package:finice/models/category_model.dart';
@@ -74,7 +75,7 @@ class CategoryDetailSheetWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: style?.color.withOpacity(0.1),
+              color: style?.color.withAlpha(30),
               shape: BoxShape.circle,
             ),
             child: Icon(style?.icon, color: style?.color, size: 32),
@@ -97,7 +98,7 @@ class CategoryDetailSheetWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              border: Border.all(color: style!.color.withOpacity(0.5)),
+              border: Border.all(color: style!.color.withAlpha(40)),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -154,8 +155,17 @@ class CategoryDetailSheetWidget extends StatelessWidget {
               Expanded(
                 child: OutlinedButton(
                   onPressed: () {
-                    Navigator.pop(context); // Tutup sheet dulu
-                    onDeleteTap(); // Jalankan logika delete dari parent
+                    ConfirmationDialog.show(
+                      context,
+                      title: 'Delete Category ?',
+                      content: 'Are you sure ?',
+                      isDestructive: true,
+                      confirmText: 'Delete',
+                      onConfirm: () {
+                        Navigator.pop(context); // Tutup sheet dulu
+                        onDeleteTap(); // Jalankan logika delete dari parent
+                      },
+                    );
                   },
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.red,

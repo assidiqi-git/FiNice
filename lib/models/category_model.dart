@@ -11,8 +11,13 @@ class CategoryModel {
     required this.type,
   });
 
-  Map<String, dynamic> toJson() {
-    return {'name': name, 'description': description ?? '', 'type': type};
+  Map<String, dynamic> toJson([String? method]) {
+    return {
+      'name': name,
+      'description': description ?? '',
+      'type': type,
+      if (method != null) '_method': method,
+    };
   }
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {

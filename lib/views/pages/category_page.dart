@@ -24,6 +24,7 @@ class _CategoryPageContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<CategoryViewModel>();
+    final messenger = ScaffoldMessenger.of(context);
 
     return RefreshIndicator(
       onRefresh: () => viewModel.fetchCategories(),
@@ -186,8 +187,42 @@ class _CategoryPageContent extends StatelessWidget {
                               CategoryDetailSheetWidget.show(
                                 context,
                                 category: category,
-                                onEdit: () {},
-                                onDelete: () {},
+                                onEdit: () async {
+                                  final bool? success = await context
+                                      .pushNamed<bool>(
+                                        'edit_category',
+                                        extra: category,
+                                      );
+
+                                  if (success == true && context.mounted) {
+                                    context
+                                        .read<CategoryViewModel>()
+                                        .fetchCategories();
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        behavior: SnackBarBehavior.floating,
+                                        content: Text('Berhasil memuat data'),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  }
+                                },
+                                onDelete: () async {
+                                  final success = await context
+                                      .read<CategoryViewModel>()
+                                      .deleteCategory(int.parse(category.id!));
+
+                                  if (success) {
+                                    messenger.showSnackBar(
+                                      const SnackBar(
+                                        behavior: SnackBarBehavior.floating,
+                                        content: Text('Berhasil dihapus'),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  }
+                                },
                               );
                             },
                             child: CategoryListWidget(
